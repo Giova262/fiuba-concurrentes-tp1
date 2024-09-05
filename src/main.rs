@@ -1,39 +1,32 @@
-use csv::ReaderBuilder;
-use serde::Deserialize;
-use std::error::Error;
+use std::thread;
+use std::time::Duration;
 
-#[derive(Debug, Deserialize)]
-struct Record {
-    field1: String,
-    field2: String,
-    field3: u32,
-}
+fn main() {
 
-fn main() -> Result<(), Box<dyn Error>> {
-    // Open the CSV file
-    let mut rdr = ReaderBuilder::new()
-        .has_headers(true) // Set to false if your CSV doesn't have headers
-        .from_path("data.csv")?;
+    // Spawn a new thread
+    let handle1 = thread::spawn(|| {
+        for i in 1..5 {
+            println!("Hello from the spawned thread 1: {}", i);
+            thread::sleep(Duration::from_millis(500));
+        }
+    });
 
-    // Iterate over each record
-    for result in rdr.deserialize() {
-        let record: Record = result?;
-        println!("{:?}", record);
+    // Spawn a new thread
+    let handle2 = thread::spawn(|| {
+        for i in 1..5 {
+            println!("Hello from the spawned thread 2: {}", i);
+            thread::sleep(Duration::from_millis(500));
+        }
+    });
+
+    // Main thread continues
+    for i in 1..5 {
+        println!("Hello from the main thread: {}", i);
+        thread::sleep(Duration::from_millis(500));
     }
 
-    Ok(())
+    // Wait for the spawned thread to finish
+    handle1.join().unwrap();
+    handle2.join().unwrap();
+
 }
-
-// fn main() {
-//     println!("Hello, world!");
-
-//     let mut rdr = ReaderBuilder::new()
-//         .has_headers(true) // Set to false if your CSV doesn't have headers
-//         .from_path("data.csv");
-
-//     // Iterate over each record
-//     for result in rdr.deserialize() {
-//         let record: Record = result;
-//         println!("{:?}", record);
-//     }
-// }
