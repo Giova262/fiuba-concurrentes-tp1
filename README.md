@@ -9,14 +9,16 @@ Trabajo Práctico
 Fecha de Entrega: 18 de Septiembre
 
 Introducción
-PUBG es un juego de disparos en primera y tercera persona estilo Battle Royale que enfrenta a más de 90 jugadores en una gran isla donde los equipos y los jugadores luchan a muerte hasta que queda uno.
+PUBG es un juego de disparos en primera y tercera persona estilo Battle Royale que enfrenta a más de 90 jugadores en una gran isla donde los equipos y los jugadores luchan a muerte 
+hasta que queda uno.
 
 El sitio pubg.op.gg publica estadísticas sobre este juego.
 
 Queremos analizar un dataset con dumps de este sitio para mejorar las estrategias de juego.
 
 Objetivo
-Implementar una aplicación en Rust para procesamiento de información, aprovechando las ventajas del modelo Fork-Join, utilizando el dataset https://www.kaggle.com/datasets/skihikingkevin/pubg-match-deaths
+Implementar una aplicación en Rust para procesamiento de información, aprovechando las ventajas del modelo Fork-Join,
+utilizando el dataset https://www.kaggle.com/datasets/skihikingkevin/pubg-match-deaths
 
 La información a obtener del mismo incluye:
 
@@ -34,30 +36,31 @@ En resumen, la aplicación será ejecutada como cargo run <input-path> <num-thre
 
 El formato del archivo de salida debe ser
 {
-    "padron": <número de padron del alumno>,
-    "top_killers": {
-        "<killer_name 1>": {
-            "deaths": <cantidad total de muertes ejecutadas por el jugador>,
-            "weapons_percentage": {
-                "<weapon name 1>": <% de uso respecto del total de muertes ocasionadas por ese jugador>,
-                ...
-            }
-        },
-        ...
-        "<killer_name N>" : {
-            ...
-        }
-    },
-    "top_weapons": {
-        "<killed_by 1>": {
-          "deaths_percentage": <% del total de muertes que produjo el arma>,
-          "average_distance": <promedio de distancia entre el asesino y la víctima para el arma>
-        },
-        ...
-        "<killed_by N>": {
+"padron": <número de padron del alumno>,
+"top_killers": {
+"<killer_name 1>": {
+"deaths": <cantidad total de muertes ejecutadas por el jugador>,
+"weapons_percentage": {
+"<weapon name 1>": <% de uso respecto del total de muertes ocasionadas por ese jugador>,
+...
+}
+},
+...
+"<killer_name N>" : {
+...
+}
+},
+"top_weapons": {
+"<killed_by 1>": {
+"deaths_percentage": <% del total de muertes que produjo el arma>,
+"average_distance": <promedio de distancia entre el asesino y la víctima para el arma>
+},
+...
+"<killed_by N>": {
 
         },
     }
+
 }
 Requerimientos no funcionales
 Los siguientes son los requerimientos no funcionales para la resolución de los ejercicios:
