@@ -1,17 +1,14 @@
 use csv::Reader;
 use rayon::prelude::*;
 use rayon::ThreadPoolBuilder;
+use serde::Deserialize;
+use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
-
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-
-use serde::Deserialize;
-use serde_json::{json, Value};
-
 use std::path::Path;
 
 #[derive(Debug, Deserialize)]
@@ -82,8 +79,6 @@ fn read_and_count_kills_parallel(input_path: String) -> Result<(), Box<dyn Error
     }
 
     // TOP KILLER
-    // let mut deaths_count: HashMap<String, u32> = HashMap::new();
-
     let deaths_count: HashMap<String, u32> = records
         .par_iter() // Iteramos en paralelo usando Rayon
         .map(|record| (record.killer_name.clone(), 1))
@@ -100,12 +95,6 @@ fn read_and_count_kills_parallel(input_path: String) -> Result<(), Box<dyn Error
                 acc
             },
         );
-
-    //   records.into_par_iter().for_each(|record| {
-    //       let mut map = deaths_count.clone();
-    //       *map.entry(record.killer_name).or_insert(0) += record.deaths;
-    //       deaths_count = map;
-    //   });
 
     let mut deaths_count_vec: Vec<(String, u32)> = deaths_count.into_iter().collect();
     deaths_count_vec.par_sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
