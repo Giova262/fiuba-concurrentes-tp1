@@ -1,207 +1,46 @@
-// use csv::ReaderBuilder;
-// use serde::Deserialize;
-// use std::error::Error;
-
-// #[derive(Debug, Deserialize)]
-// struct Record {
-//     field1: String,
-//     field2: String,
-//     field3: u32,
-// }
-
-// fn main() -> Result<(), Box<dyn Error>> {
-//     // Open the CSV file
-//     let mut rdr = ReaderBuilder::new()
-//         .has_headers(true) // Set to false if your CSV doesn't have headers
-//         .from_path("data.csv")?;
-
-//     // Iterate over each record
-//     for result in rdr.deserialize() {
-//         let record: Record = result?;
-//         println!("{:?}", record);
-//     }
-
-//     Ok(())
-// }
-
-// fn main() {
-//     println!("Hello, world!");
-
-//     let mut rdr = ReaderBuilder::new()
-//         .has_headers(true) // Set to false if your CSV doesn't have headers
-//         .from_path("data.csv");
-
-//     // Iterate over each record
-//     for result in rdr.deserialize() {
-//         let record: Record = result;
-//         println!("{:?}", record);
-//     }
-// }
-
-// --------------
-
-// use rayon::prelude::*;
-
-// fn main() {
-//     let data: Vec<u64> = (1..=1000).collect();
-//     let total: u64 = data.par_iter().map(|&x| x).sum();
-//     println!("La suma es: {}", total);
-// }
-
-// ----------------------------
-
-// use rayon::prelude::*;
-// use std::error::Error;
-// use std::fs::File;
-// use std::io;
-// use csv::ReaderBuilder;
-
-// fn sum_csv_column(file_path: &str) -> Result<u64, io::Error> {
-//     // Intentar abrir el archivo
-//     let file = File::open(file_path)?;
-
-//     // Crear un lector CSV a partir del archivo
-//     let mut rdr = ReaderBuilder::new().from_reader(file);
-
-//     // Calcular la suma de la columna
-//     let sum: u64 = rdr
-//         .records()
-//         .filter_map(|result| {
-//             match result {
-//                 Ok(record) => {
-//                     record.get(0)
-//                         .and_then(|val| val.parse::<u64>().ok())
-//                 }
-//                 Err(err) => {
-//                     eprintln!("Error al leer el registro: {}", err);
-//                     None
-//                 }
-//             }
-//         })
-//         .sum();
-
-//     Ok(sum)
-// }
-
-// fn main() -> Result<(), Box<dyn Error>> {
-//     // Rutas a los archivos CSV
-//     let file1 = "data1.csv";
-//     let file2 = "data2.csv";
-
-//     let (result1, result2) = rayon::join(
-//         || sum_csv_column(file1),
-//         || sum_csv_column(file2),
-//     );
-
-//     // Leer y procesar los archivos en paralelo
-//     // rayon::join(|| sum_csv_column(file1), || sum_csv_column(file2));
-
-//     // Manejar los resultados
-//     // let sum1 = result1?;
-//     // let sum2 = result2?;
-
-//     // println!("La suma de la columna en {} es: {}", file1, sum1);
-//     // println!("La suma de la columna en {} es: {}", file2, sum2);
-//     // println!("La suma total es: {}", sum1 + sum2);
-
-//     Ok(())
-// }
-
-
-// --------------
-
-
-// use csv::Reader;
-// use std::error::Error;
-
-// fn read_csv() -> Result<(), Box<dyn Error>> {
-//     let mut rdr = Reader::from_path("dataset/deaths/kill_match_stats_final_0.csv")?;
-
-//     for result in rdr.records() {
-//         let record = result?;
-//         println!("{:?}", record);
-//     }
-
-//     Ok(())
-// }
-
-// fn main() {
-//     if let Err(err) = read_csv() {
-//         println!("Error reading CSV: {}", err);
-//     }
-// }
-
-//--------------------
-
-// use std::collections::HashMap;
-// use std::error::Error;
-// use serde::Deserialize;
-// use csv::Reader;
-
-// #[derive(Debug, Deserialize)]
-// struct Record {
-//     killed_by: String,
-// }
-
-// fn read_and_count_kills() -> Result<(), Box<dyn Error>> {
-//     // Creamos un HashMap para contar la cantidad de muertes por arma.
-//     let mut kill_counts: HashMap<String, u32> = HashMap::new();
-    
-//     // Abrimos el archivo CSV
-//     let mut rdr = Reader::from_path("dataset/deaths/kill_match_stats_final_0.csv")?;
-
-//     // Recorremos cada fila
-//     for result in rdr.deserialize() {
-//         let record: Record = result?;
-        
-//         // Incrementamos el contador de muertes por arma
-//         *kill_counts.entry(record.killed_by).or_insert(0) += 1;
-//     }
-
-//     // Convertimos el HashMap en un vector de tuplas para ordenar
-//     let mut kills_vec: Vec<(String, u32)> = kill_counts.into_iter().collect();
-    
-//     // Ordenamos primero por cantidad de muertes en orden descendente y luego alfabéticamente en caso de empate
-//     kills_vec.sort_by(|a, b| {
-//         b.1.cmp(&a.1)  // Ordenar por la cantidad de muertes (descendente)
-//             .then(a.0.cmp(&b.0))  // En caso de empate, ordenar por nombre (alfabéticamente)
-//     });
-
-//     // Tomamos los primeros 10 resultados
-//     let top_10 = &kills_vec[..10.min(kills_vec.len())];
-
-//     // Mostramos el top 10
-//     for (weapon, count) in top_10 {
-//         println!("{}: {}", weapon, count);
-//     }
-
-//     Ok(())
-// }
-
-// fn main() {
-//     if let Err(err) = read_and_count_kills() {
-//         println!("Error: {}", err);
-//     }
-// }
-
-
-use std::collections::HashMap;
-use std::error::Error;
-use serde::Deserialize;
 use csv::Reader;
-use rayon::prelude::*; // Para usar Rayon
+use rayon::prelude::*;
+use rayon::ThreadPoolBuilder;
+
+use serde::Deserialize;
+use std::collections::HashMap;
+use std::env;
+use std::error::Error;
+
+use std::fs::File;
+use std::io::Write;
+use std::path::Path;
 
 #[derive(Debug, Deserialize)]
 struct Record {
     killed_by: String,
 }
 
-fn read_and_count_kills_parallel() -> Result<(), Box<dyn Error>> {
+fn crear_archivo_salida(output_path: &str, contenido: &str) -> std::io::Result<()> {
+    // Convertir la cadena de la ruta en un objeto Path
+    let path = Path::new(output_path);
+
+    // Crear el archivo en la ruta especificada
+    let mut archivo = File::create(&path)?;
+
+    // Escribir el contenido en el archivo
+    archivo.write_all(contenido.as_bytes())?;
+
+    println!("Archivo creado y contenido escrito en: {}", output_path);
+    Ok(())
+}
+
+fn read_and_count_kills_parallel(
+    input_path: String,
+    output_file_name: String,
+) -> Result<(), Box<dyn Error>> {
     // Abrimos el archivo CSV
-    let mut rdr = Reader::from_path("dataset/deaths/kill_match_stats_final_0.csv")?;
+    let mut rdr = Reader::from_path(input_path)?;
+    //let mut rdr = Reader::from_path("dataset/deaths/kill_match_stats_final_0.csv")?;
 
     // Leemos todas las filas del CSV en memoria
-    let records: Vec<Record> = rdr.deserialize()
+    let records: Vec<Record> = rdr
+        .deserialize()
         .filter_map(Result::ok) // Ignoramos errores en las filas y tomamos las exitosas
         .collect();
 
@@ -232,8 +71,8 @@ fn read_and_count_kills_parallel() -> Result<(), Box<dyn Error>> {
 
     // Ordenamos primero por la cantidad de muertes en orden descendente y luego alfabéticamente en caso de empate
     kills_vec.par_sort_by(|a, b| {
-        b.1.cmp(&a.1)  // Ordenar por la cantidad de muertes (descendente)
-            .then(a.0.cmp(&b.0))  // En caso de empate, ordenar por nombre (alfabéticamente)
+        b.1.cmp(&a.1) // Ordenar por la cantidad de muertes (descendente)
+            .then(a.0.cmp(&b.0)) // En caso de empate, ordenar por nombre (alfabéticamente)
     });
 
     // Tomamos los primeros 10 resultados
@@ -244,11 +83,36 @@ fn read_and_count_kills_parallel() -> Result<(), Box<dyn Error>> {
         println!("{}: {}", weapon, count);
     }
 
+    let contenido = "Este es el contenido del archivo de salida.";
+
+    // Llamar a la función para crear el archivo de salida
+    if let Err(e) = crear_archivo_salida(output_file_name.as_str(), contenido) {
+        eprintln!("Error al crear el archivo: {}", e);
+    }
+
     Ok(())
 }
 
 fn main() {
-    if let Err(err) = read_and_count_kills_parallel() {
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() < 4 {
+        eprintln!("La cantidad de argumentos no es valida, utilice el siguiente formado: cargo run <input-path> <num-threads> <output-file-name>\n");
+        std::process::exit(1);
+    }
+
+    let input_path: String = args[1].parse().expect("Error al parse");
+    let threads: usize = args[2].parse().expect("Error al parse");
+    let output_file_name: String = args[3].parse().expect("Error al parse");
+
+    println!("threads: {}", threads);
+
+    match ThreadPoolBuilder::new().num_threads(threads).build_global() {
+        Ok(_) => {}
+        Err(e) => eprintln!("Error al crear ThreadPool: {}", e),
+    }
+
+    if let Err(err) = read_and_count_kills_parallel(input_path, output_file_name) {
         println!("Error: {}", err);
     }
 }
