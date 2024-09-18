@@ -12,12 +12,12 @@ use std::io::Write;
 use serde::Deserialize;
 use serde_json::{json, Value};
 
-use csv::ReaderBuilder;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 #[derive(Debug, Deserialize)]
 struct Record {
     killed_by: String,
+    killer_name: String,
 }
 
 fn add_element_to_json(json_obj: &mut Value, key: &str, value: Value) {
@@ -35,7 +35,6 @@ fn create_json_file(output_path: &str, json_data: &str) -> std::io::Result<()> {
 }
 
 fn read_and_count_kills_parallel(input_path: String) -> Result<(), Box<dyn Error>> {
- 
     let mut json_salida = json!({
         "padron": "93075",
     });
@@ -47,9 +46,10 @@ fn read_and_count_kills_parallel(input_path: String) -> Result<(), Box<dyn Error
 
     let records: Vec<Record> = rdr.deserialize().filter_map(Result::ok).collect();
 
+    // TOP WEAPONS
     let kill_counts: HashMap<String, u32> = records
         .par_iter() // Iteramos en paralelo usando Rayon
-        .map(|record| (record.killed_by.clone(), 1)) // Mapeamos cada arma a (arma, 1)
+        .map(|record| (record.killed_by.clone(), 1))
         .fold(HashMap::new, |mut acc, (weapon, count)| {
             *acc.entry(weapon).or_insert(0) += count;
             acc
@@ -65,11 +65,8 @@ fn read_and_count_kills_parallel(input_path: String) -> Result<(), Box<dyn Error
         );
 
     let mut kills_vec: Vec<(String, u32)> = kill_counts.into_iter().collect();
-    kills_vec.par_sort_by(|a, b| {
-        b.1.cmp(&a.1).then(a.0.cmp(&b.0)) // En caso de empate, ordenar por nombre (alfabéticamente)
-    });
+    kills_vec.par_sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
 
-    // Me quedo con los primeros 10 resultados
     let top_10 = &kills_vec[..10.min(kills_vec.len())];
 
     for (weapon, count) in top_10 {
@@ -84,6 +81,47 @@ fn read_and_count_kills_parallel(input_path: String) -> Result<(), Box<dyn Error
         );
     }
 
+    // TOP KILLER
+    // let mut deaths_count: HashMap<String, u32> = HashMap::new();
+
+    let deaths_count: HashMap<String, u32> = records
+        .par_iter() // Iteramos en paralelo usando Rayon
+        .map(|record| (record.killer_name.clone(), 1))
+        .fold(HashMap::new, |mut acc, (killer, count)| {
+            *acc.entry(killer).or_insert(0) += count;
+            acc
+        })
+        .reduce(
+            || HashMap::new(),
+            |mut acc, map| {
+                for (killer, count) in map {
+                    *acc.entry(killer).or_insert(0) += count;
+                }
+                acc
+            },
+        );
+
+    //   records.into_par_iter().for_each(|record| {
+    //       let mut map = deaths_count.clone();
+    //       *map.entry(record.killer_name).or_insert(0) += record.deaths;
+    //       deaths_count = map;
+    //   });
+
+    let mut deaths_count_vec: Vec<(String, u32)> = deaths_count.into_iter().collect();
+    deaths_count_vec.par_sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+
+    let top_deaths_10 = &deaths_count_vec[..10.min(deaths_count_vec.len())];
+
+    for (killer, count) in top_deaths_10 {
+        add_element_to_json(
+            &mut json_top_killers,
+            killer,
+            json!({
+                "deaths": count,
+                "weapons_percentage": count,
+            }),
+        );
+    }
 
     // PREPARO LOS DATOS PARA EL ARCHIVO FINAL QUE SE EXPORTA00
     add_element_to_json(&mut json_salida, "json_top_killers", json_top_killers);

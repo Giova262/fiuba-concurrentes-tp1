@@ -1,0 +1,97 @@
+{
+  "json_top_killers": {
+    "": {
+      "deaths": 928630,
+      "weapons_percentage": 928630
+    },
+    "#unknown": {
+      "deaths": 61471,
+      "weapons_percentage": 61471
+    },
+    "Ashbur_": {
+      "deaths": 352,
+      "weapons_percentage": 352
+    },
+    "GhostDL": {
+      "deaths": 321,
+      "weapons_percentage": 321
+    },
+    "JZalan": {
+      "deaths": 406,
+      "weapons_percentage": 406
+    },
+    "VanThang": {
+      "deaths": 324,
+      "weapons_percentage": 324
+    },
+    "feitengdedan": {
+      "deaths": 358,
+      "weapons_percentage": 358
+    },
+    "hzxiaobin": {
+      "deaths": 425,
+      "weapons_percentage": 425
+    },
+    "siliymaui125": {
+      "deaths": 325,
+      "weapons_percentage": 325
+    },
+    "zzTo": {
+      "deaths": 310,
+      "weapons_percentage": 310
+    }
+  },
+  "json_top_weapons": {
+    "AKM": {
+      "average_distance": 1142941,
+      "cantidad_muertes": 1142941,
+      "deaths_percentage": 1142941
+    },
+    "Bluezone": {
+      "average_distance": 657889,
+      "cantidad_muertes": 657889,
+      "deaths_percentage": 657889
+    },
+    "Down and Out": {
+      "average_distance": 2310417,
+      "cantidad_muertes": 2310417,
+      "deaths_percentage": 2310417
+    },
+    "M16A4": {
+      "average_distance": 1237998,
+      "cantidad_muertes": 1237998,
+      "deaths_percentage": 1237998
+    },
+    "M416": {
+      "average_distance": 1538312,
+      "cantidad_muertes": 1538312,
+      "deaths_percentage": 1538312
+    },
+    "Mini 14": {
+      "average_distance": 409859,
+      "cantidad_muertes": 409859,
+      "deaths_percentage": 409859
+    },
+    "Punch": {
+      "average_distance": 353928,
+      "cantidad_muertes": 353928,
+      "deaths_percentage": 353928
+    },
+    "S1897": {
+      "average_distance": 569420,
+      "cantidad_muertes": 569420,
+      "deaths_percentage": 569420
+    },
+    "SCAR-L": {
+      "average_distance": 1252632,
+      "cantidad_muertes": 1252632,
+      "deaths_percentage": 1252632
+    },
+    "UMP9": {
+      "average_distance": 737322,
+      "cantidad_muertes": 737322,
+      "deaths_percentage": 737322
+    }
+  },
+  "padron": "93075"
+}
