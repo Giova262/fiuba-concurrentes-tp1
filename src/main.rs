@@ -74,8 +74,8 @@ fn read_and_count_kills_parallel(input_path: String) -> Result<(), Box<dyn Error
             &mut json_top_weapons,
             weapon,
             json!({
-                "deaths_percentage": count,
-                "average_distance": count,
+                "deaths_percentage": null,
+                "average_distance": null,
                 "cantidad_muertes": count,
             }),
         );
@@ -118,7 +118,7 @@ fn read_and_count_kills_parallel(input_path: String) -> Result<(), Box<dyn Error
             killer,
             json!({
                 "deaths": count,
-                "weapons_percentage": count,
+                "weapons_percentage": null,
             }),
         );
     }
